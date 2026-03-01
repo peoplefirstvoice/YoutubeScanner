@@ -662,22 +662,6 @@ body::after {
 .view-title { font-size:20px; font-weight:800; letter-spacing:-0.3px; }
 .view-sub { font-size:13px; color:var(--c-text2); margin-top:4px; }
 
-.ch-add-bar {
-  padding:16px 24px 8px;
-  display:flex; flex-wrap:wrap; gap:8px;
-  flex-shrink:0;
-}
-.ch-add-bar input {
-  flex:1;
-  background:var(--c-surface2);
-  border:1px solid var(--c-border2);
-  border-radius:var(--r-sm);
-  padding:10px 14px;
-  color:var(--c-text);
-  font-family:'Outfit',sans-serif;
-  font-size:13px; outline:none;
-  transition:border-color 0.15s;
-}
 .ch-add-bar input:focus { border-color:var(--c-teal); }
 .ch-add-bar input::placeholder { color:var(--c-text3); }
 
@@ -719,32 +703,18 @@ body::after {
 }
 .btn-add:hover { background:#00efc0; }
 
-.ch-quota {
-  padding:0 24px 12px;
-  display:flex; align-items:center; gap:8px;
-  font-size:12px; color:var(--c-text3);
-  flex-shrink:0;
-}
-.ch-quota-bar {
-  height:3px; flex:1; max-width:120px;
-  background:var(--c-surface3); border-radius:2px; overflow:hidden;
-}
-.ch-quota-fill {
-  height:100%; background:var(--c-teal); border-radius:2px;
-  transition:width 0.3s;
-}
 
 .ch-list {
   flex:1; overflow-y:auto;
   padding:0 24px 40px;
-  display:flex; flex-direction:column; gap:8px;
+  display:flex; flex-direction:column; gap:6px;
 }
 .ch-card {
   background:var(--c-surface);
   border:1px solid var(--c-border);
-  border-radius:var(--r);
-  padding:13px 16px;
-  display:flex; align-items:center; gap:13px;
+  border-radius:var(--r-sm);
+  padding:10px 14px;
+  display:flex; align-items:center; gap:12px;
   transition:border-color 0.15s;
   animation:cardIn 0.2s ease;
 }
@@ -756,8 +726,7 @@ body::after {
   width:40px; height:40px; border-radius:50%;
   background:var(--c-surface2);
   overflow:hidden; flex-shrink:0;
-  display:flex; align-items:flex-start; justify-content:center;
-  padding:20px 0;
+  display:flex; align-items:center; justify-content:center;
   font-size:16px; font-weight:700; color:var(--c-text2);
 }
 .ch-avatar img { width:100%; height:100%; object-fit:cover; }
@@ -771,11 +740,11 @@ body::after {
 .ch-status-dot.error { background:var(--c-red); }
 
 .btn-rm {
-  padding:5px 10px;
+  padding:5px 9px;
   background:transparent; border:1px solid rgba(255,77,106,0.2);
   border-radius:var(--r-sm);
   color:var(--c-red); font-size:12px;
-  cursor:pointer; transition:all 0.15s;
+  cursor:pointer; transition:all 0.15s; flex-shrink:0;
 }
 .btn-rm:hover { background:rgba(255,77,106,0.1); }
 
@@ -1233,18 +1202,80 @@ code {
 
     <!-- ═══ CHANNELS VIEW ═══ -->
     <div class="view" id="view-channels" style="overflow-x:hidden;">
-      <div class="view-header" style="margin-top:20px;padding:0 24px;">
-        <div class="view-title">채널 관리</div>
-        <div class="view-sub">YouTube 채널을 등록하여 주기적으로 모니터링합니다. (최대 50개)</div>
+      <!-- 상단 헤더 + 입력 -->
+      <div style="padding:20px 24px 0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div class="view-title" style="margin:0;">채널 관리</div>
+          <span id="quotaText" style="font-size:12px;color:var(--c-text3);">0 / 50개 등록됨</span>
+        </div>
+        <div style="height:3px;background:var(--c-surface2);border-radius:2px;margin-bottom:14px;">
+          <div id="quotaFill" style="height:100%;background:var(--c-teal);border-radius:2px;width:0%;transition:width 0.4s;"></div>
+        </div>
+
+        <!-- 채널 입력 -->
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input type="text" id="chInput" style="flex:1;background:var(--c-surface2);border:1px solid var(--c-border2);border-radius:var(--r-sm);padding:10px 14px;color:var(--c-text);font-family:'Outfit',sans-serif;font-size:13px;outline:none;"
+            placeholder="@채널핸들 또는 유튜브 채널 URL  예) @MrBeast"
+            onkeydown="if(event.key==='Enter')addChannel()"
+            onfocus="this.style.borderColor='var(--c-teal)'"
+            onblur="this.style.borderColor='var(--c-border2)'">
+          <button class="btn-add" onclick="addChannel()">+ 추가</button>
+        </div>
+
+        <!-- Excel 업로드 바 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(0,212,170,0.04);border:1px solid rgba(0,212,170,0.15);border-radius:var(--r-sm);margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <label class="btn-excel-upload" style="margin:0;">
+              📂 Excel 일괄 등록
+              <input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelUpload(event)">
+            </label>
+            <span style="font-size:11px;color:var(--c-text3);">— 최대 50개 한번에 등록</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:11px;color:var(--c-teal);cursor:pointer;text-decoration:underline;" onclick="downloadTemplate()">⬇ 양식 다운로드</span>
+            <span style="font-size:11px;color:var(--c-text3);cursor:pointer;user-select:none;" onclick="toggleExcelGuide()" id="excelGuideToggle">📋 사용법 <span id="excelGuideArrow">▼</span></span>
+          </div>
+        </div>
       </div>
 
-      <div class="ch-add-bar">
-        <input type="text" id="chInput" placeholder="@채널핸들 또는 유튜브 채널 URL 입력  예: @MrBeast" onkeydown="if(event.key==='Enter')addChannel()">
-        <button class="btn-add" onclick="addChannel()">+ 추가</button>
-        <label class="btn-excel-upload" title="Excel/CSV 파일로 채널 일괄 등록">
-          📂 Excel 업로드
-          <input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelUpload(event)">
-        </label>
+      <!-- Excel 사용법 (기본 접힘) -->
+      <div id="excelGuide" style="display:none;margin:0 24px 16px;padding:14px 16px;background:rgba(0,212,170,0.03);border:1px dashed rgba(0,212,170,0.2);border-radius:var(--r-sm);font-size:12px;color:var(--c-text2);">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <span style="padding:2px 8px;background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.25);border-radius:20px;font-size:11px;color:var(--c-teal);">.xlsx</span>
+          <span style="padding:2px 8px;background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.25);border-radius:20px;font-size:11px;color:var(--c-teal);">.xls</span>
+          <span style="padding:2px 8px;background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.25);border-radius:20px;font-size:11px;color:var(--c-teal);">.csv</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+          <div style="padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;border:1px solid var(--c-border);">
+            <div style="font-size:11px;font-weight:700;color:var(--c-text2);margin-bottom:4px;">① 양식 구조</div>
+            <div style="font-size:11px;color:var(--c-text3);line-height:1.7;">A열: 순번 (1~50 미리 입력됨)<br><strong style="color:var(--c-teal);">B열: 채널 URL 입력 ← 여기만</strong></div>
+          </div>
+          <div style="padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;border:1px solid var(--c-border);">
+            <div style="font-size:11px;font-weight:700;color:var(--c-text2);margin-bottom:4px;">② 입력 가능 형식</div>
+            <div style="font-size:11px;color:var(--c-text3);line-height:1.7;"><code style="color:var(--c-teal);">@채널핸들</code><br><code style="color:var(--c-teal);">youtube.com/@핸들</code></div>
+          </div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:'DM Mono',monospace;table-layout:fixed;">
+          <tr style="background:rgba(0,212,170,0.08);">
+            <td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);width:28px;">행</td>
+            <td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);width:34px;">A열</td>
+            <td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-teal);">B열 ← 여기에 URL 입력</td>
+          </tr>
+          <tr style="opacity:0.6;"><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);">1</td><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);">순번</td><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);">채널 URL (헤더)</td></tr>
+          <tr><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);">2</td><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);">1</td><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-teal);">@이재명</td></tr>
+          <tr><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);">3</td><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);">2</td><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-teal);">https://youtube.com/@MBC뉴스</td></tr>
+          <tr><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);">4~51</td><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);">3~50</td><td style="padding:4px 8px;border:1px solid var(--c-border);color:var(--c-text3);">빈칸 또는 URL 계속 입력</td></tr>
+        </table>
+        <div style="margin-top:8px;padding:7px 10px;background:rgba(255,185,48,0.06);border:1px solid rgba(255,185,48,0.2);border-radius:6px;font-size:11px;color:var(--c-amber);line-height:1.6;">
+          ⚠️ 빈 칸 자동 무시 · 이미 등록된 채널 자동 스킵 · 채널 1개당 쿼터 ~200유닛 소모
+        </div>
+        <!-- 진행 상태 표시 -->
+        <div id="excelProgress" style="display:none;margin-top:10px;">
+          <div style="font-size:12px;color:var(--c-text2);margin-bottom:5px;" id="excelProgressText">처리 중...</div>
+          <div style="background:var(--c-surface2);border-radius:4px;overflow:hidden;height:5px;">
+            <div id="excelProgressBar" style="height:100%;background:var(--c-teal);width:0%;transition:width 0.3s;"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Excel 업로드 안내 -->
@@ -1337,12 +1368,7 @@ code {
         </div>
       </div>
 
-      <div class="ch-quota" style="margin:0 24px;">
-        <div class="ch-quota-bar">
-          <div class="ch-quota-fill" id="quotaFill" style="width:0%"></div>
-        </div>
-        <span id="quotaText">0 / 50개 등록됨</span>
-      </div>
+
 
       <div class="ch-list" id="chList">
         <div class="empty-state" style="flex:none;padding:40px 0;">
@@ -1563,6 +1589,17 @@ function showNoBanner() {
   bar.style.cssText = 'position:fixed;top:60px;left:0;right:0;z-index:90;background:rgba(255,185,48,0.1);border-bottom:1px solid rgba(255,185,48,0.25);padding:8px 20px;font-size:12px;color:var(--c-amber);display:flex;align-items:center;gap:10px;';
   bar.innerHTML = '<span>⚠️ API 키가 등록되지 않았습니다.</span><button onclick="openAdmin();this.parentElement.remove()" style="background:var(--c-amber);color:#07080f;border:none;border-radius:4px;padding:3px 12px;font-size:11px;font-weight:700;cursor:pointer;">지금 등록하기</button><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:var(--c-amber);cursor:pointer;margin-left:auto;font-size:14px;">✕</button>';
   document.body.appendChild(bar);
+}
+
+// ════════════════════════════════
+// EXCEL GUIDE TOGGLE
+// ════════════════════════════════
+function toggleExcelGuide() {
+  const guide  = document.getElementById('excelGuide');
+  const arrow  = document.getElementById('excelGuideArrow');
+  const isOpen = guide.style.display !== 'none';
+  guide.style.display  = isOpen ? 'none' : 'block';
+  arrow.textContent    = isOpen ? '▼' : '▲';
 }
 
 // ════════════════════════════════
@@ -2293,35 +2330,67 @@ function saveChannels() {
 }
 
 function renderChannels() {
-  const ok = channels.filter(c=>c.status==='ok').length;
+  const okChs = channels.filter(c=>c.status==='ok');
+  const ok    = okChs.length;
   document.getElementById('quotaText').textContent = `${ok} / 50개 등록됨`;
   document.getElementById('quotaFill').style.width = (ok/50*100) + '%';
   document.getElementById('navChCount').textContent = ok;
 
   const el = document.getElementById('chList');
   if (channels.length === 0) {
-    el.innerHTML = `<div class="empty-state" style="flex:none;padding:40px 0;"><div class="empty-icon">📡</div><div class="empty-title">등록된 채널 없음</div><div class="empty-sub">위에 채널을 추가해보세요</div></div>`;
+    el.innerHTML = `
+      <div class="empty-state" style="flex:none;padding:60px 0;">
+        <div class="empty-icon">📡</div>
+        <div class="empty-title">등록된 채널 없음</div>
+        <div class="empty-sub">위에서 채널을 직접 추가하거나<br>Excel로 일괄 등록해보세요</div>
+      </div>`;
     return;
   }
-  el.innerHTML = channels.map(c => `
+
+  // 섹션 헤더 + 채널 목록
+  const okList   = channels.filter(c => c.status === 'ok');
+  const pendList = channels.filter(c => c.status === 'loading');
+  const errList  = channels.filter(c => c.status === 'error');
+
+  const renderCard = (c, idx) => `
     <div class="ch-card ${c.status !== 'ok' ? c.status : ''}">
-      <div class="ch-avatar">${c.avatar ? `<img src="${c.avatar}" alt="">` : (c.name?.[0]||'?')}</div>
+      <div style="font-size:11px;color:var(--c-text3);font-family:'DM Mono',monospace;min-width:20px;text-align:right;">${c.status==='ok' ? idx+1 : ''}</div>
+      <div class="ch-avatar">${c.avatar ? `<img src="${c.avatar}" alt="" onerror="this.parentElement.textContent='${esc(c.name?.[0]||'?')}'">` : esc(c.name?.[0]||'?')}</div>
       <div class="ch-info">
-        <div class="ch-name">${esc(c.name)}</div>
-        <div class="ch-handle">${esc(c.handle||c.id||'')}</div>
+        <div class="ch-name">${esc(c.name || '로딩 중...')}</div>
+        <div class="ch-handle">${c.status==='loading' ? '검색 중...' : esc(c.handle||c.id||'')}</div>
       </div>
-      ${c.subs ? `<div class="ch-subs">${fmtShort(c.subs)} 구독</div>` : ''}
+      ${c.subs ? `<div class="ch-subs">${fmtShort(c.subs)}<br><span style="font-size:9px;color:var(--c-text3);">구독자</span></div>` : ''}
       ${c.status === 'ok' ? `
         <select class="cat-select ${c.category||''}"
           onchange="setChannelCategory('${c.id}', this.value); this.className='cat-select '+this.value;">
           <option value="" ${!c.category?'selected':''}>미분류</option>
           <option value="보수" ${c.category==='보수'?'selected':''}>🔴 보수</option>
           <option value="진보" ${c.category==='진보'?'selected':''}>🔵 진보</option>
-        </select>` : ''}
+        </select>` : `<div style="font-size:11px;color:${c.status==='loading'?'var(--c-amber)':'var(--c-red)'};">${c.status==='loading'?'⏳':'❌'}</div>`}
       <div class="ch-status-dot ${c.status}"></div>
-      <button class="btn-rm" onclick="removeChannel('${c.id||c.tempId}')">✕ 삭제</button>
-    </div>
-  `).join('');
+      <button class="btn-rm" onclick="removeChannel('${c.id||c.tempId}')">✕</button>
+    </div>`;
+
+  let html = '';
+
+  // 등록된 채널 목록
+  if (okList.length > 0) {
+    html += `<div style="font-size:11px;font-weight:700;color:var(--c-text3);padding:4px 0 6px;letter-spacing:0.05em;">등록된 채널 — ${okList.length}개</div>`;
+    html += okList.map((c, i) => renderCard(c, i)).join('');
+  }
+  // 처리 중
+  if (pendList.length > 0) {
+    html += `<div style="font-size:11px;font-weight:700;color:var(--c-amber);padding:10px 0 6px;">처리 중 — ${pendList.length}개</div>`;
+    html += pendList.map((c, i) => renderCard(c, i)).join('');
+  }
+  // 오류
+  if (errList.length > 0) {
+    html += `<div style="font-size:11px;font-weight:700;color:var(--c-red);padding:10px 0 6px;">오류 — ${errList.length}개 <span style="font-weight:400;color:var(--c-text3);">(삭제 후 재등록 필요)</span></div>`;
+    html += errList.map((c, i) => renderCard(c, i)).join('');
+  }
+
+  el.innerHTML = html;
 }
 
 function renderSidebar() {
