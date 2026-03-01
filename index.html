@@ -1358,13 +1358,35 @@ code {
 // ════════════════════════════════
 const MAX_KEYS   = 10;
 
+// ══════════════════════════════════════════════
+// ▼▼▼ 여기에 API 키를 넣어주세요 ▼▼▼
+// 키가 있는 슬롯만 채우고, 나머지는 '' 로 두세요
+const DEFAULT_KEYS = [
+  'AIzaSyAlusvUGRe1WvR4sAX0jPRZPW3XSY972kg',
+  'AIzaSyCFsBBoaU9QQEuyg_NmF32xd1OxLkDOQxY',
+  'AIzaSyCIJ121WSJ6VIwLXq0uM7wZiL5oz5sc4ss',
+  'AIzaSyCJFymodiZ5bD7-xjpB1QwB0hKVXVobBPI',
+  'AIzaSyCQPuZP3gquoR2N3LkOELzPhSE7SJkqZww',
+  'AIzaSyD3f-0yzLV1Ix3RmJ-Ff5YsgbIIr1FYb-o',
+  'AIzaSyD0kLWmp3Ar6AGoBxaL9iZhpr5lrJsMd8A',
+  'AIzaSyAFZgnDAQaQlqt2bmwiD3Ts-9MioFHvFy8',
+  'AIzaSyAW9SImbmsS1nrLneaykxaGx1oGAd-oLdU',
+  'AIzaSyAXrSAN-06qTBneWZqr-APmuXcAcMIwulg',
+];
+// ▲▲▲ 여기까지 ▲▲▲
+// ══════════════════════════════════════════════
+
 // ── localStorage에서 데이터 로드 (단순 명확한 방식)
 function lsGet(key, fallback) {
   try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
   catch(e) { return fallback; }
 }
 
-let apiKeys     = lsGet('yt_keys', Array(MAX_KEYS).fill(''));
+// localStorage 키 우선, 없으면 DEFAULT_KEYS 사용
+let _lsKeys = lsGet('yt_keys', null);
+let apiKeys = (_lsKeys && _lsKeys.some(k=>k))
+  ? _lsKeys
+  : DEFAULT_KEYS.slice(0, MAX_KEYS).map(k => k.startsWith('AIzaSy_키') ? '' : k);
 let keyStatus   = Array(MAX_KEYS).fill(0); // 세션 시작 시 항상 초기화
 let activeKeyIdx = 0;
 let apiKey      = '';
