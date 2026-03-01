@@ -663,8 +663,8 @@ body::after {
 .view-sub { font-size:13px; color:var(--c-text2); margin-top:4px; }
 
 .ch-add-bar {
-  padding:16px 24px;
-  display:flex; gap:10px;
+  padding:16px 24px 8px;
+  display:flex; flex-wrap:wrap; gap:8px;
   flex-shrink:0;
 }
 .ch-add-bar input {
@@ -692,7 +692,7 @@ body::after {
 }
 .btn-excel-upload:hover { background:rgba(0,212,170,0.15); border-style:solid; }
 .excel-upload-area {
-  margin-bottom:12px;
+  margin:0 24px 12px;
   padding:14px 16px;
   background:rgba(0,212,170,0.04);
   border:1px dashed rgba(0,212,170,0.2);
@@ -1232,8 +1232,8 @@ code {
 
 
     <!-- ═══ CHANNELS VIEW ═══ -->
-    <div class="view" id="view-channels">
-      <div class="view-header" style="margin-top:20px;">
+    <div class="view" id="view-channels" style="overflow-x:hidden;">
+      <div class="view-header" style="margin-top:20px;padding:0 24px;">
         <div class="view-title">채널 관리</div>
         <div class="view-sub">YouTube 채널을 등록하여 주기적으로 모니터링합니다. (최대 50개)</div>
       </div>
@@ -1266,34 +1266,56 @@ code {
           <div style="padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border:1px solid var(--c-border);">
             <div style="font-size:11px;font-weight:700;color:var(--c-text2);margin-bottom:6px;">① 파일 형식</div>
             <div style="font-size:11px;color:var(--c-text3);line-height:1.7;">
-              A열 1행부터 채널을 한 줄씩 입력<br>
-              첫 행은 헤더(채널URL 등)도 OK — 자동 스킵
+              <strong style="color:var(--c-teal)">B열</strong>에 채널 URL 입력<br>
+              A열(순번 1~50)은 미리 채워져 있음
             </div>
           </div>
           <div style="padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border:1px solid var(--c-border);">
             <div style="font-size:11px;font-weight:700;color:var(--c-text2);margin-bottom:6px;">② 입력 가능한 형식</div>
             <div style="font-size:11px;color:var(--c-text3);line-height:1.7;">
               @핸들: <code style="color:var(--c-teal);">@channelname</code><br>
-              URL: <code style="color:var(--c-teal);">youtube.com/@handle</code>
+              URL: <code style="color:var(--c-teal);">youtube.com/@handle</code><br>
+              빈 칸은 자동 무시
             </div>
           </div>
         </div>
 
         <!-- 예시 테이블 -->
-        <div style="font-size:11px;font-weight:700;color:var(--c-text2);margin-bottom:6px;">📄 Excel 파일 예시</div>
-        <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:'DM Mono',monospace;">
+        <div style="font-size:11px;font-weight:700;color:var(--c-text2);margin-bottom:6px;">📄 Excel 파일 예시 (B열에만 입력하세요)</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:'DM Mono',monospace;table-layout:fixed;">
           <thead>
             <tr style="background:rgba(0,212,170,0.08);">
-              <td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text3);width:40px;">행</td>
-              <td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text3);">A열 (채널URL)</td>
-              <td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text3);">비고</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);width:32px;">행</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);width:36px;">A열<br><span style="color:var(--c-text3);font-size:9px;">순번</span></td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-teal);">B열 <strong>← 여기에 입력</strong><br><span style="font-size:9px;color:var(--c-text3);">채널 URL</span></td>
             </tr>
           </thead>
           <tbody>
-            <tr><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text3);">1</td><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text2);">채널URL</td><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text3);">헤더 — 자동 무시</td></tr>
-            <tr><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text3);">2</td><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-teal);">@이재명</td><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text3);">@핸들 형식</td></tr>
-            <tr><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text3);">3</td><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-teal);">https://www.youtube.com/@MBC뉴스</td><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text3);">URL 형식</td></tr>
-            <tr><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text3);">4</td><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-teal);">@yonhapnewstv</td><td style="padding:5px 10px;border:1px solid var(--c-border);color:var(--c-text3);">영어 핸들도 가능</td></tr>
+            <tr style="background:rgba(255,255,255,0.02);">
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">1</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">순번</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">채널 URL &nbsp;← 헤더, 수정 금지</td>
+            </tr>
+            <tr>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">2</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">1</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-teal);">@이재명</td>
+            </tr>
+            <tr>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">3</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">2</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-teal);">https://www.youtube.com/@MBC뉴스</td>
+            </tr>
+            <tr>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">4</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">3</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-teal);">@yonhapnewstv</td>
+            </tr>
+            <tr>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">5~51</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">4~50</td>
+              <td style="padding:5px 8px;border:1px solid var(--c-border);color:var(--c-text3);">← URL 입력 또는 빈칸</td>
+            </tr>
           </tbody>
         </table>
 
@@ -1315,7 +1337,7 @@ code {
         </div>
       </div>
 
-      <div class="ch-quota">
+      <div class="ch-quota" style="margin:0 24px;">
         <div class="ch-quota-bar">
           <div class="ch-quota-fill" id="quotaFill" style="width:0%"></div>
         </div>
@@ -1904,7 +1926,6 @@ function parseInput(raw) {
 
 // ── 샘플 CSV 다운로드
 async function downloadTemplate() {
-  // SheetJS 동적 로드
   if (!window.XLSX) {
     toast('📦 Excel 라이브러리 로드 중...', 'ok');
     try {
@@ -1912,7 +1933,7 @@ async function downloadTemplate() {
         const s = document.createElement('script');
         s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
         s.onload = res;
-        s.onerror = () => rej(new Error('라이브러리 로드 실패'));
+        s.onerror = () => rej(new Error('로드 실패'));
         document.head.appendChild(s);
       });
     } catch(e) {
@@ -1923,17 +1944,12 @@ async function downloadTemplate() {
 
   const wb = XLSX.utils.book_new();
 
-  // ── 시트1: 채널 등록 양식 (실제 입력 시트)
-  const rows = [
-    ['채널 URL'],   // A1: 헤더 (수정 금지)
-    ['@channelhandle'],                          // 예시1
-    ['https://www.youtube.com/@channelhandle'],  // 예시2
-  ];
-  // 빈 행 추가 (50행까지)
-  for (let i = 3; i < 52; i++) rows.push(['']);
-
+  // ── 시트1: 채널 등록 양식
+  // A열=순번(1~50), B열=채널URL(사용자 입력)
+  const rows = [['순번', '채널 URL']]; // 헤더
+  for (let i = 1; i <= 50; i++) rows.push([i, '']); // 순번 1~50 미리입력
   const ws1 = XLSX.utils.aoa_to_sheet(rows);
-  ws1['!cols'] = [{ wch: 60 }];
+  ws1['!cols'] = [{ wch: 8 }, { wch: 60 }]; // A열 좁게, B열 넓게
   XLSX.utils.book_append_sheet(wb, ws1, '채널등록');
 
   // ── 시트2: 작성 안내
@@ -1941,29 +1957,26 @@ async function downloadTemplate() {
     ['[ YT Scanner — 채널 등록 양식 작성 방법 ]'],
     [''],
     ['■ 작성 방법'],
-    ['1. "채널등록" 시트로 이동하세요.'],
-    ['2. A1 헤더(채널 URL)는 그대로 두고, A2부터 채널을 한 줄씩 입력하세요.'],
-    ['3. 2~3행의 예시는 삭제하거나 덮어써도 됩니다.'],
-    ['4. 저장 후 YT Scanner의 [📂 Excel 업로드] 버튼으로 업로드하세요.'],
+    ['1. "채널등록" 시트의 B열(채널 URL)에 채널 주소를 입력하세요.'],
+    ['2. A열(순번)은 수정하지 마세요.'],
+    ['3. 파일 저장 후 YT Scanner > 채널 관리 > [📂 Excel 업로드] 버튼으로 업로드하세요.'],
     [''],
-    ['■ 입력 가능한 형식 (A열에 아무 형식이나 입력 가능)'],
-    ['형식',       '입력 예시',                                    '설명'],
-    ['@핸들',      '@이재명',                                      '채널 주소의 @ 뒤 이름'],
-    ['전체 URL',   'https://www.youtube.com/@이재명',              '유튜브 채널 페이지 주소'],
-    ['채널 ID',    'UCxxxxxxxxxxxxxxxxxxxxxxxxx',                  'UC로 시작하는 24자리 ID'],
+    ['■ B열에 입력 가능한 형식'],
+    ['형식',     '입력 예시',                             '설명'],
+    ['@핸들',    '@channelname',                         '채널 주소의 @ 뒤 이름'],
+    ['전체 URL', 'https://www.youtube.com/@channelname', '유튜브 채널 페이지 주소 전체'],
     [''],
     ['■ 주의사항'],
+    ['• URL을 입력하지 않은 행은 자동으로 무시됩니다.'],
     ['• 최대 50개까지 등록 가능합니다.'],
     ['• 이미 등록된 채널은 자동으로 건너뜁니다.'],
-    ['• B열 이후는 무시되므로 비워두어도 됩니다.'],
-    ['• 채널 1개 등록 시 API 쿼터 약 200유닛 소모됩니다.'],
   ];
   const ws2 = XLSX.utils.aoa_to_sheet(guide);
-  ws2['!cols'] = [{ wch: 45 }, { wch: 50 }, { wch: 30 }];
+  ws2['!cols'] = [{ wch: 12 }, { wch: 55 }, { wch: 30 }];
   XLSX.utils.book_append_sheet(wb, ws2, '작성방법');
 
   XLSX.writeFile(wb, 'YTScanner_채널등록양식.xlsx');
-  toast('📥 Excel 양식 다운로드 완료! "채널등록" 시트 A2부터 입력하세요.', 'ok');
+  toast('📥 Excel 양식 다운로드 완료! B열에 채널 URL을 입력하세요.', 'ok');
 }
 function downloadSample() { downloadTemplate(); } // 하위 호환
 
@@ -1973,41 +1986,58 @@ async function handleExcelUpload(event) {
   if (!file) return;
   event.target.value = '';
 
-  // ── 사전 검증
   if (!apiKey) { toast('API 키를 먼저 등록해주세요 — ⚙️ 설정에서 등록', 'err'); return; }
-  if (scanning) { toast('스캔 중에는 업로드할 수 없습니다. 스캔 완료 후 다시 시도하세요.', 'warn'); return; }
+  if (scanning) { toast('스캔 중에는 업로드할 수 없습니다.', 'warn'); return; }
 
-  // ── 버튼 비활성화 (중복 업로드 방지)
+  // 버튼 비활성화
   const uploadLabel = document.querySelector('.btn-excel-upload');
   const uploadInput = uploadLabel?.querySelector('input[type=file]');
   if (uploadLabel) uploadLabel.style.pointerEvents = 'none';
   if (uploadInput) uploadInput.disabled = true;
 
-  // ── 파일 파싱
   let lines = [];
   try {
     if (file.name.toLowerCase().endsWith('.csv')) {
       const text = await file.text();
-      lines = text.split(/\r?\n/)
-        .map(l => l.split(',')[0].trim().replace(/^["']|["']$/g, ''))
-        .filter(Boolean);
+      const allRows = text.split(/\r?\n/).map(l => l.split(','));
+      // 헤더 행 확인: 첫 행이 '순번','채널 URL' 형태인지
+      // B열(index 1)을 읽되, B열이 없으면 A열(index 0) fallback
+      const firstRow = allRows[0] || [];
+      const hasHeader = firstRow.some(c => ['순번','채널url','채널 url','url','채널','channel'].includes((c||'').trim().toLowerCase()));
+      const startRow  = hasHeader ? 1 : 0;
+      for (let i = startRow; i < allRows.length; i++) {
+        const row = allRows[i];
+        // B열 우선, 없으면 A열
+        const val = (row[1] || row[0] || '').trim().replace(/^["']|["']$/g, '');
+        if (val) lines.push(val);
+      }
     } else {
-      // Excel — SheetJS 동적 로드
+      // Excel
       if (!window.XLSX) {
         toast('📦 Excel 라이브러리 로드 중...', 'ok');
         await new Promise((res, rej) => {
           const s = document.createElement('script');
           s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
           s.onload = res;
-          s.onerror = () => rej(new Error('Excel 라이브러리 로드 실패 — 인터넷 연결 확인'));
+          s.onerror = () => rej(new Error('Excel 라이브러리 로드 실패'));
           document.head.appendChild(s);
         });
       }
       const buf  = await file.arrayBuffer();
       const wb   = XLSX.read(buf, { type: 'array' });
-      const ws   = wb.Sheets[wb.SheetNames[0]]; // 첫 번째 시트만 읽음
+      // 첫 번째 시트 (채널등록)
+      const ws   = wb.Sheets[wb.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-      lines = data.map(row => String(row[0] || '').trim()).filter(Boolean); // A열만
+      // 첫 행이 헤더인지 확인
+      const firstRow = data[0] || [];
+      const hasHeader = firstRow.some(c => ['순번','채널url','채널 url','url','채널','channel'].includes(String(c||'').trim().toLowerCase()));
+      const startIdx  = hasHeader ? 1 : 0;
+      for (let i = startIdx; i < data.length; i++) {
+        const row = data[i];
+        // B열(index 1) 우선, 없으면 A열(index 0) fallback
+        const val = String(row[1] || row[0] || '').trim();
+        if (val && val !== '0' && isNaN(Number(val))) lines.push(val); // 순번 숫자는 제외
+      }
     }
   } catch(e) {
     toast('파일 읽기 실패: ' + e.message, 'err');
@@ -2016,21 +2046,20 @@ async function handleExcelUpload(event) {
     return;
   }
 
-  // ── 헤더 행 제거 ('채널 url', 'url', 'channel' 등)
-  const SKIP_HEADERS = ['채널url','채널 url','채널 url','url','채널','channel','handle','채널명','이름','name'];
-  lines = lines.filter(l => !SKIP_HEADERS.includes(l.toLowerCase()));
+  // 헤더/빈값 추가 필터
+  const SKIP = ['채널url','채널 url','url','채널','channel','handle','채널명','이름','name','채널 url'];
+  lines = lines.filter(l => l && !SKIP.includes(l.toLowerCase()));
 
   if (!lines.length) {
-    toast('파일에서 채널 정보를 찾을 수 없습니다\nA열에 @핸들 또는 URL이 있는지 확인하세요', 'err');
+    toast('등록할 채널이 없습니다.\nB열(채널 URL)에 채널 주소가 입력됐는지 확인하세요.', 'err');
     if (uploadLabel) uploadLabel.style.pointerEvents = '';
     if (uploadInput) uploadInput.disabled = false;
     return;
   }
 
-  const currentOk = channels.filter(c => c.status === 'ok').length;
-  const limit = 50 - currentOk;
+  const limit = 50 - channels.filter(c => c.status === 'ok').length;
   if (limit <= 0) {
-    toast('채널이 이미 최대(50개)입니다. 일부 삭제 후 다시 시도하세요.', 'err');
+    toast('채널이 이미 최대(50개)입니다.', 'err');
     if (uploadLabel) uploadLabel.style.pointerEvents = '';
     if (uploadInput) uploadInput.disabled = false;
     return;
@@ -2038,11 +2067,11 @@ async function handleExcelUpload(event) {
 
   const toAdd = lines.slice(0, limit);
   if (lines.length > limit) {
-    toast(`⚠️ ${lines.length}개 중 ${limit}개만 처리됩니다 (최대 50개 제한)`, 'warn');
-    await sleep(1500);
+    toast(`⚠️ ${lines.length}개 중 ${limit}개만 처리됩니다.`, 'warn');
+    await sleep(1000);
   }
 
-  // ── 진행바 표시
+  // 진행바
   const prog     = document.getElementById('excelProgress');
   const progText = document.getElementById('excelProgressText');
   const progBar  = document.getElementById('excelProgressBar');
@@ -2057,31 +2086,28 @@ async function handleExcelUpload(event) {
     progBar.style.width = Math.round((i / toAdd.length) * 100) + '%';
     progText.textContent = `처리 중 (${i+1}/${toAdd.length}): ${raw}`;
 
-    // parseInput으로 형식 파악
     const parsed = parseInput(raw);
     if (!parsed) {
       fail++;
-      failList.push(`${raw} — 인식 불가 (@핸들 또는 URL 형식인지 확인)`);
+      failList.push(`${raw} — 인식 불가`);
       await sleep(100);
       continue;
     }
 
-    // 중복 체크 — 채널 ID 기준 (가장 정확)
-    // 이름 기준 중복은 lookupChannel 후 pushChannel 내부에서 id로 최종 방어
+    // ID 기준 중복 체크
     if (parsed.type === 'id' && channels.some(c => c.id === parsed.value)) {
       skip++; await sleep(100); continue;
     }
 
     try {
       const chData = await lookupChannel(parsed);
-      // 이미 등록된 채널 ID면 스킵 (pushChannel 내부 방어)
       const before = channels.length;
-      pushChannel(chData, false); // saveChannels는 마지막에 한번만
+      pushChannel(chData, false);
       if (channels.length > before) {
         renderChannels(); renderSidebar();
         success++;
       } else {
-        skip++; // pushChannel에서 중복 감지됨
+        skip++;
       }
     } catch(e) {
       fail++;
@@ -2091,19 +2117,16 @@ async function handleExcelUpload(event) {
     await sleep(500);
   }
 
-  // ── 완료 처리
   progBar.style.width = '100%';
   progText.textContent = `완료! ✅ ${success}개 등록 / ${skip}개 중복 스킵 / ${fail}개 실패`;
   setTimeout(() => { prog.style.display = 'none'; }, 6000);
 
-  if (success > 0) saveChannels(); // 한 번만 저장
+  if (success > 0) saveChannels();
   updateScanStatus();
 
-  // 버튼 복원
   if (uploadLabel) uploadLabel.style.pointerEvents = '';
   if (uploadInput) uploadInput.disabled = false;
 
-  // 결과 토스트
   let msg = `✅ ${success}개 등록 완료`;
   if (skip) msg += ` | ${skip}개 중복 스킵`;
   if (fail) msg += ` | ${fail}개 실패`;
@@ -2111,7 +2134,7 @@ async function handleExcelUpload(event) {
 
   if (failList.length) {
     console.warn('[Excel Upload] 실패 목록:\n' + failList.join('\n'));
-    setTimeout(() => toast(`실패 ${failList.length}개 — 콘솔(F12)에서 상세 확인`, 'warn'), 1500);
+    setTimeout(() => toast(`실패 ${failList.length}개 — F12 콘솔에서 확인`, 'warn'), 1500);
   }
 }
 // ── 조용한 채널 추가 — lookupChannel 재사용
