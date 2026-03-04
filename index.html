@@ -1076,8 +1076,8 @@ code {
         <div class="filter-group">
           <span class="filter-label">최소 조회수</span>
           <select class="refresh-select" id="viewsSelect" onchange="onViewsSelect()" style="min-width:90px;">
-            <option value="0">전체</option>
-            <option value="10000" selected>1만+</option>
+            <option value="0" selected>전체</option>
+            <option value="10000">1만+</option>
             <option value="30000">3만+</option>
             <option value="50000">5만+</option>
             <option value="100000">10만+</option>
@@ -1112,8 +1112,8 @@ code {
         <div class="filter-group">
           <span class="filter-label">기간</span>
           <select class="refresh-select" id="periodSelect" style="min-width:90px;">
-            <option value="7" selected>최근 7일</option>
-            <option value="30">최근 30일</option>
+            <option value="7">최근 7일</option>
+            <option value="30" selected>최근 30일</option>
             <option value="90">최근 90일</option>
             <option value="180">최근 180일</option>
             <option value="365">최근 1년</option>
@@ -1541,7 +1541,7 @@ let scanResults = [];
 let displayResults = [];
 
 let filterType     = 'all';
-let filterViews    = 10000; // 기본값: 1만+
+let filterViews    = 0; // 기본값: 전체 (필터 없음)
 let filterLikes    = 0;
 let filterKeyword  = '';
 let filterCategory = '';
@@ -2509,10 +2509,8 @@ async function startScan() {
 }
 
 async function fetchChannelVideos(ch) {
-  const periodDays = parseInt(document.getElementById('periodSelect')?.value || '7');
+  const periodDays = parseInt(document.getElementById('periodSelect')?.value || '30');
   const maxPerCh   = parseInt(document.getElementById('maxPerSelect')?.value || '10');
-  // 페이지당 50개 → 필요한 페이지 수 계산 (최대 2페이지)
-  const maxPages   = Math.ceil(Math.min(maxPerCh, 50) / 50);
 
   let publishedAfter = '';
   if (periodDays > 0) {
@@ -2521,77 +2519,52 @@ async function fetchChannelVideos(ch) {
     publishedAfter = d.toISOString();
   }
 
-  // ── 1차 수집: 인기순(viewCount) — 해당 기간 내 인기 영상 우선
-  let popularIds = [];
-  try {
-    const params = {
-      part:'id', channelId:ch.id, type:'video',
-      maxResults: Math.min(maxPerCh, 50),
-      order:'viewCount'  // 인기순
-    };
-    if (publishedAfter) params.publishedAfter = publishedAfter;
-    const res = await ytApiAuto('search', params);
-    if (!res.error && res.items?.length) {
-      popularIds = res.items.map(i => i.id.videoId).filter(Boolean);
-    }
-  } catch(e) { /* 인기순 실패 시 최신순으로 fallback */ }
+  // ── API 호출: 인기순(viewCount) 으로 maxPerCh개 수집
+  // 인기순으로 가져온 뒤 앱 내에서 "인기순 1위, 최신순 2위" 재정렬
+  let allIds = [];
+  const params = {
+    part: 'id',
+    channelId: ch.id,
+    type: 'video',
+    maxResults: Math.min(maxPerCh, 50),
+    order: 'viewCount'
+  };
+  if (publishedAfter) params.publishedAfter = publishedAfter;
 
-  // ── 2차 수집: 최신순(date) — 인기순에서 못 가져온 경우 보완
-  let recentIds = [];
-  try {
-    const params = {
-      part:'id', channelId:ch.id, type:'video',
-      maxResults: Math.min(maxPerCh, 50),
-      order:'date'  // 최신순
-    };
-    if (publishedAfter) params.publishedAfter = publishedAfter;
-    const res = await ytApiAuto('search', params);
-    if (!res.error && res.items?.length) {
-      recentIds = res.items.map(i => i.id.videoId).filter(Boolean);
-    }
-  } catch(e) {}
-
-  // ── 중복 제거 후 합산 (인기순 우선, 최신순 보완)
-  const seen = new Set(popularIds);
-  for (const id of recentIds) {
-    if (!seen.has(id)) { seen.add(id); popularIds.push(id); }
-  }
-  // 최종 maxPerCh개로 제한
-  const allIds = popularIds.slice(0, maxPerCh);
+  const res = await ytApiAuto('search', params);
+  if (res.error) throw new Error(res.error.message);
+  allIds = (res.items || []).map(i => i.id.videoId).filter(Boolean);
 
   if (!allIds.length) return [];
 
-  // ── 영상 상세 정보 수집 (videos API)
-  const chunks = [];
-  for (let i = 0; i < allIds.length; i += 50) chunks.push(allIds.slice(i, i + 50));
+  // ── 영상 상세 정보 (통계 포함)
+  const detail = await ytApiAuto('videos', {
+    part: 'snippet,contentDetails,statistics',
+    id: allIds.join(',')
+  });
+  if (detail.error) throw new Error(detail.error.message);
 
-  const allVideos = [];
-  for (const chunk of chunks) {
-    const detail = await ytApiAuto('videos', {
-      part:'snippet,contentDetails,statistics', id:chunk.join(',')
-    });
-    if (detail.error) throw new Error(detail.error.message);
-    allVideos.push(...(detail.items || []));
-    if (chunks.length > 1) await sleep(200);
-  }
-
-  const mapped = allVideos.map(v => {
+  const mapped = (detail.items || []).map(v => {
     const dur = parseDur(v.contentDetails?.duration || 'PT0S');
     return {
-      id: v.id,
-      chId: ch.id, chName: ch.name, chAvatar: ch.avatar, category: ch.category||'',
+      id:          v.id,
+      chId:        ch.id,
+      chName:      ch.name,
+      chAvatar:    ch.avatar,
+      category:    ch.category || '',
       title:       v.snippet?.title || '',
       thumb:       v.snippet?.thumbnails?.medium?.url || v.snippet?.thumbnails?.default?.url || '',
       publishedAt: v.snippet?.publishedAt || '',
-      dur, durStr: fmtDur(dur),
-      views:   +(v.statistics?.viewCount  || 0),
-      likes:   +(v.statistics?.likeCount  || 0),
-      isShort: dur > 0 && dur <= 60,
-      url: `https://www.youtube.com/watch?v=${v.id}`
+      dur,
+      durStr:      fmtDur(dur),
+      views:       +(v.statistics?.viewCount || 0),
+      likes:       +(v.statistics?.likeCount || 0),
+      isShort:     dur > 0 && dur <= 60,
+      url:         `https://www.youtube.com/watch?v=${v.id}`
     };
   });
 
-  // ── 채널 내 정렬: 인기순 1위, 동일 조회수면 최신순 2위
+  // ── 채널 내 정렬 원칙: 1위 인기순(조회수), 2위 최신순
   mapped.sort((a, b) => {
     if (b.views !== a.views) return b.views - a.views;
     return new Date(b.publishedAt) - new Date(a.publishedAt);
@@ -2599,6 +2572,7 @@ async function fetchChannelVideos(ch) {
 
   return mapped;
 }
+
 
 // ════════════════════════════════
 // FILTERS
